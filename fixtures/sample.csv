@@ -1,0 +1,4 @@
+# tiny comma-separated fixture (no GUI export yet)
+t,x,y
+0,1.0,2.0
+0.04,1.5,2.5
