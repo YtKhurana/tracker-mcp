@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
+import { runDataRead } from "./data.js";
 import { runProjectInspect } from "./inspect.js";
 import { runProjectList } from "./list.js";
 import { runTrackerStatus } from "./status.js";
@@ -53,6 +54,22 @@ export function createTrackerMcpServer(): McpServer {
     },
     async (args) => {
       const body = runProjectInspect(args ?? {});
+      return { content: [{ type: "text", text: JSON.stringify(body) }] };
+    },
+  );
+  server.registerTool(
+    "data_read",
+    {
+      description:
+        "Read an existing CSV as stored, or image-space PointMass$FrameData (frame,x,y) from a .trk/.trz. Does not compute velocities or start Java.",
+      inputSchema: {
+        path: z.unknown(),
+        track: z.unknown().optional(),
+        format: z.unknown().optional(),
+      },
+    },
+    async (args) => {
+      const body = runDataRead(args ?? {});
       return { content: [{ type: "text", text: JSON.stringify(body) }] };
     },
   );

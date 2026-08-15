@@ -85,10 +85,10 @@ test("stdio MCP initialize and tools/list", async () => {
     const listed = await readJsonLine(child);
     assert.equal(listed.id, 2);
     assert.equal(listed.error, undefined, JSON.stringify(listed.error));
-    assert.equal(listed.result.tools.length, 3);
+    assert.equal(listed.result.tools.length, 4);
     assert.deepEqual(
       listed.result.tools.map((tool) => tool.name),
-      ["tracker_status", "project_list", "project_inspect"],
+      ["tracker_status", "project_list", "project_inspect", "data_read"],
     );
     child.stdin.write("not-json\n");
     send(child, { jsonrpc: "2.0", id: 3, method: "tools/list" });
@@ -135,6 +135,19 @@ test("stdio MCP initialize and tools/list", async () => {
     assert.equal(inspectBody.ok, true);
     assert.equal(inspectBody.kind, "trk");
     assert.equal(inspectBody.tracks[1].mark_count, 2);
+
+    send(child, {
+      jsonrpc: "2.0",
+      id: 7,
+      method: "tools/call",
+      params: { name: "data_read", arguments: { path: trk, track: "mass A" } },
+    });
+    const read = await readJsonLine(child);
+    assert.equal(read.id, 7);
+    const readBody = JSON.parse(read.result.content[0].text);
+    assert.equal(readBody.ok, true);
+    assert.equal(readBody.source, "trk_xml");
+    assert.deepEqual(readBody.rows[1], [2, 3, 4]);
   } catch (error) {
     const extra = stderr.join("");
     if (extra) {

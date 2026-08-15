@@ -148,6 +148,39 @@ export function writeStoreZip(filePath, entries) {
   writeFileSync(filePath, Buffer.concat(chunks));
 }
 
+export const TWO_MASS_TRK = `<?xml version="1.0" encoding="UTF-8"?>
+<object class="org.opensourcephysics.cabrillo.tracker.TrackerPanel">
+  <property name="tracks" type="collection" class="java.util.ArrayList">
+    <property name="item" type="object">
+      <object class="org.opensourcephysics.cabrillo.tracker.PointMass">
+        <property name="name" type="string">mass A</property>
+        <property name="framedata" type="array" class="[Lorg.opensourcephysics.cabrillo.tracker.PointMass$FrameData;">
+          <property name="[0]" type="object">
+            <object class="org.opensourcephysics.cabrillo.tracker.PointMass$FrameData">
+              <property name="x" type="double">1.0</property>
+              <property name="y" type="double">2.0</property>
+            </object>
+          </property>
+        </property>
+      </object>
+    </property>
+    <property name="item" type="object">
+      <object class="org.opensourcephysics.cabrillo.tracker.PointMass">
+        <property name="name" type="string">mass B</property>
+        <property name="framedata" type="array" class="[Lorg.opensourcephysics.cabrillo.tracker.PointMass$FrameData;">
+          <property name="[1]" type="object">
+            <object class="org.opensourcephysics.cabrillo.tracker.PointMass$FrameData">
+              <property name="x" type="double">9.0</property>
+              <property name="y" type="double">8.0</property>
+            </object>
+          </property>
+        </property>
+      </object>
+    </property>
+  </property>
+</object>
+`;
+
 export function writeTempTrk(xml = MINIMAL_TRK, name = "sample.trk") {
   const dir = makeTempDir("tracker-mcp-trk-");
   const file = path.join(dir, name);

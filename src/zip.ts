@@ -62,7 +62,7 @@ export function readTrkFromZip(buf: Buffer, zipPath: string): ZipReadResult {
   const base = path.basename(zipPath, path.extname(zipPath)).toLowerCase();
   const chosen =
     trks.find((entry) => path.basename(entry.name, path.extname(entry.name)).toLowerCase() === base) ?? trks[0];
-  if (chosen.uncomp > MAX_TRK_BYTES) {
+  if (chosen.uncomp > MAX_TRK_BYTES || chosen.comp > MAX_TRK_BYTES) {
     return { ok: false, reason: "too_large" };
   }
   const local = chosen.local;
@@ -80,6 +80,9 @@ export function readTrkFromZip(buf: Buffer, zipPath: string): ZipReadResult {
   let raw: Buffer;
   try {
     if (chosen.method === 0) {
+      if (chosen.comp !== chosen.uncomp) {
+        return { ok: false, reason: "bad_zip" };
+      }
       raw = Buffer.from(compressed);
     } else if (chosen.method === 8) {
       raw = inflateRawSync(compressed, { maxOutputLength: MAX_TRK_BYTES });

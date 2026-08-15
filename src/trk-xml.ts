@@ -1,6 +1,7 @@
 import { childObjects, parseXml, property, textOf, type XmlNode } from "./xml.js";
 
 const PANEL = "org.opensourcephysics.cabrillo.tracker.TrackerPanel";
+const POINT_MASS = "org.opensourcephysics.cabrillo.tracker.PointMass";
 const FRAME_DATA = "org.opensourcephysics.cabrillo.tracker.PointMass$FrameData";
 const COORD_FRAME = "org.opensourcephysics.media.core.ImageCoordSystem$FrameData";
 
@@ -160,12 +161,18 @@ function markCount(track: XmlNode): number {
   return count;
 }
 
-function parseTracks(panel: XmlNode): InspectTrack[] {
+type TrackNode = {
+  name: string | null;
+  class: string;
+  node: XmlNode;
+};
+
+function trackNodes(panel: XmlNode): TrackNode[] {
   const tracks = property(panel, "tracks");
   if (!tracks) {
     return [];
   }
-  const result: InspectTrack[] = [];
+  const result: TrackNode[] = [];
   for (const item of tracks.children.filter((child) => child.name === "property" && child.attrs.name === "item")) {
     const track = childObjects(item)[0];
     if (!track?.attrs.class) {
@@ -174,10 +181,72 @@ function parseTracks(panel: XmlNode): InspectTrack[] {
     result.push({
       name: strProp(track, "name"),
       class: track.attrs.class,
-      mark_count: markCount(track),
+      node: track,
     });
   }
   return result;
+}
+
+function parseTracks(panel: XmlNode): InspectTrack[] {
+  return trackNodes(panel).map((track) => ({
+    name: track.name,
+    class: track.class,
+    mark_count: markCount(track.node),
+  }));
+}
+
+export type MarkRow = [frame: number, x: number, y: number];
+
+export type PointMassTable =
+  | { ok: true; name: string | null; rows: MarkRow[] }
+  | { ok: false; reason: "no_track" | "not_point_mass" | "ambiguous" };
+
+function markRows(track: XmlNode): MarkRow[] {
+  const framedata = property(track, "framedata");
+  if (!framedata) {
+    return [];
+  }
+  const rows: MarkRow[] = [];
+  for (const slot of framedata.children.filter((child) => child.name === "property")) {
+    const index = /^\[(\d+)\]$/.exec(slot.attrs.name ?? "");
+    const frame = childObjects(slot)[0];
+    if (!index || !frame || frame.attrs.class !== FRAME_DATA) {
+      continue;
+    }
+    const x = numProp(frame, "x");
+    const y = numProp(frame, "y");
+    if (x === null || y === null) {
+      throw new Error("bad_trk");
+    }
+    rows.push([Number(index[1]), x, y]);
+  }
+  return rows;
+}
+
+export function readPointMassTable(xml: string, trackName: string | null): PointMassTable {
+  const root = parseXml(xml);
+  if (root.name !== "object" || root.attrs.class !== PANEL) {
+    throw new Error("bad_trk");
+  }
+  const tracks = trackNodes(root);
+  if (trackName !== null) {
+    const match = tracks.find((track) => track.name === trackName);
+    if (!match) {
+      return { ok: false, reason: "no_track" };
+    }
+    if (match.class !== POINT_MASS) {
+      return { ok: false, reason: "not_point_mass" };
+    }
+    return { ok: true, name: match.name, rows: markRows(match.node) };
+  }
+  const masses = tracks.filter((track) => track.class === POINT_MASS);
+  if (masses.length === 0) {
+    return { ok: false, reason: "no_track" };
+  }
+  if (masses.length > 1) {
+    return { ok: false, reason: "ambiguous" };
+  }
+  return { ok: true, name: masses[0].name, rows: markRows(masses[0].node) };
 }
 
 export function parseTrackerPanelXml(xml: string): InspectPayload {
