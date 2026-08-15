@@ -3,6 +3,8 @@ import { spawn } from "node:child_process";
 import path from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { makeTempDir } from "./helpers/bundle.js";
+import { writeTempTrk } from "./helpers/trk.js";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const entry = path.join(root, "dist", "index.js");
@@ -83,7 +85,56 @@ test("stdio MCP initialize and tools/list", async () => {
     const listed = await readJsonLine(child);
     assert.equal(listed.id, 2);
     assert.equal(listed.error, undefined, JSON.stringify(listed.error));
-    assert.deepEqual(listed.result.tools, []);
+    assert.equal(listed.result.tools.length, 3);
+    assert.deepEqual(
+      listed.result.tools.map((tool) => tool.name),
+      ["tracker_status", "project_list", "project_inspect"],
+    );
+    child.stdin.write("not-json\n");
+    send(child, { jsonrpc: "2.0", id: 3, method: "tools/list" });
+    const afterBadLine = await readJsonLine(child);
+    assert.equal(afterBadLine.id, 3);
+    assert.equal(afterBadLine.result.tools[2].name, "project_inspect");
+    assert.match(stderr.join(""), /\S/);
+
+    send(child, {
+      jsonrpc: "2.0",
+      id: 4,
+      method: "tools/call",
+      params: { name: "tracker_status", arguments: { probe_service: "yes" } },
+    });
+    const called = await readJsonLine(child);
+    assert.equal(called.id, 4);
+    const body = JSON.parse(called.result.content[0].text);
+    assert.equal(body.ok, false);
+    assert.equal(body.error.code, "INVALID_ARGUMENT");
+
+    const emptyDir = makeTempDir();
+    send(child, {
+      jsonrpc: "2.0",
+      id: 5,
+      method: "tools/call",
+      params: { name: "project_list", arguments: { dir: emptyDir } },
+    });
+    const listedProjects = await readJsonLine(child);
+    assert.equal(listedProjects.id, 5);
+    const listBody = JSON.parse(listedProjects.result.content[0].text);
+    assert.equal(listBody.ok, true);
+    assert.deepEqual(listBody.projects, []);
+
+    const trk = writeTempTrk();
+    send(child, {
+      jsonrpc: "2.0",
+      id: 6,
+      method: "tools/call",
+      params: { name: "project_inspect", arguments: { path: trk } },
+    });
+    const inspected = await readJsonLine(child);
+    assert.equal(inspected.id, 6);
+    const inspectBody = JSON.parse(inspected.result.content[0].text);
+    assert.equal(inspectBody.ok, true);
+    assert.equal(inspectBody.kind, "trk");
+    assert.equal(inspectBody.tracks[1].mark_count, 2);
   } catch (error) {
     const extra = stderr.join("");
     if (extra) {
@@ -91,7 +142,12 @@ test("stdio MCP initialize and tools/list", async () => {
     }
     throw error;
   } finally {
-    child.kill("SIGTERM");
-    await new Promise((resolve) => child.once("close", resolve));
+    if (child.exitCode === null && child.signalCode === null) {
+      child.kill("SIGTERM");
+      await Promise.race([
+        new Promise((resolve) => child.once("close", resolve)),
+        new Promise((resolve) => setTimeout(resolve, 1000)),
+      ]);
+    }
   }
 });
