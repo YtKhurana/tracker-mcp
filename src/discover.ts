@@ -53,7 +53,12 @@ function parseJavaVersion(releasePath: string): string | null {
   if (!isFile(releasePath)) {
     return null;
   }
-  const text = readFileSync(releasePath, "utf8");
+  let text: string;
+  try {
+    text = readFileSync(releasePath, "utf8");
+  } catch {
+    return null;
+  }
   const match = text.match(/^JAVA_VERSION="([^"]+)"/m);
   return match?.[1] ?? null;
 }

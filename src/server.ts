@@ -1,9 +1,24 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { runDataRead } from "./data.js";
+import { fail } from "./errors.js";
 import { runProjectInspect } from "./inspect.js";
 import { runProjectList } from "./list.js";
 import { runTrackerStatus } from "./status.js";
+
+function toolText(body: unknown) {
+  return { content: [{ type: "text" as const, text: JSON.stringify(body) }] };
+}
+
+function safeTool(run: (args: unknown) => unknown) {
+  return async (args: Record<string, unknown> | undefined) => {
+    try {
+      return toolText(run(args ?? {}));
+    } catch {
+      return toolText(fail("PARSE_FAILED", "unexpected tool failure", { reason: "uncaught" }));
+    }
+  };
+}
 
 export const SERVER_NAME = "tracker-mcp";
 export const SERVER_VERSION = "0.1.0";
@@ -23,10 +38,7 @@ export function createTrackerMcpServer(): McpServer {
         probe_service: z.unknown().optional(),
       },
     },
-    async (args) => {
-      const body = runTrackerStatus(args ?? {});
-      return { content: [{ type: "text", text: JSON.stringify(body) }] };
-    },
+    safeTool(runTrackerStatus),
   );
   server.registerTool(
     "project_list",
@@ -38,10 +50,7 @@ export function createTrackerMcpServer(): McpServer {
         recursive: z.unknown().optional(),
       },
     },
-    async (args) => {
-      const body = runProjectList(args ?? {});
-      return { content: [{ type: "text", text: JSON.stringify(body) }] };
-    },
+    safeTool(runProjectList),
   );
   server.registerTool(
     "project_inspect",
@@ -52,10 +61,7 @@ export function createTrackerMcpServer(): McpServer {
         path: z.unknown(),
       },
     },
-    async (args) => {
-      const body = runProjectInspect(args ?? {});
-      return { content: [{ type: "text", text: JSON.stringify(body) }] };
-    },
+    safeTool(runProjectInspect),
   );
   server.registerTool(
     "data_read",
@@ -68,10 +74,7 @@ export function createTrackerMcpServer(): McpServer {
         format: z.unknown().optional(),
       },
     },
-    async (args) => {
-      const body = runDataRead(args ?? {});
-      return { content: [{ type: "text", text: JSON.stringify(body) }] };
-    },
+    safeTool(runDataRead),
   );
   return server;
 }

@@ -1,4 +1,6 @@
-export type ErrorCode = "NOT_FOUND" | "INVALID_ARGUMENT" | "PARSE_FAILED";
+export const ERROR_CODES = ["NOT_FOUND", "INVALID_ARGUMENT", "PARSE_FAILED"] as const;
+
+export type ErrorCode = (typeof ERROR_CODES)[number];
 
 export type ErrorEnvelope = {
   ok: false;

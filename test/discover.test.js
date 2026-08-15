@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdirSync } from "node:fs";
+import { chmodSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { test } from "node:test";
 import { discoverTrackerRuntime } from "../dist/discover.js";
@@ -78,6 +78,22 @@ test("JRE symlink outside the app is refused", () => {
     env: { TRACKER_APP: app },
     defaultAppPath: "/Applications/Tracker.app",
   });
+  assert.equal(result.ok, false);
+  assert.equal(result.error.code, "NOT_FOUND");
+});
+
+test("unreadable JRE release is NOT_FOUND not a throw", () => {
+  const { app, home } = makeTrackerBundle();
+  chmodSync(path.join(home, "release"), 0);
+  let result;
+  try {
+    result = discoverTrackerRuntime({
+      env: { TRACKER_APP: app },
+      defaultAppPath: "/Applications/Tracker.app",
+    });
+  } finally {
+    chmodSync(path.join(home, "release"), 0o644);
+  }
   assert.equal(result.ok, false);
   assert.equal(result.error.code, "NOT_FOUND");
 });
