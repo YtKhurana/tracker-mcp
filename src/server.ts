@@ -8,6 +8,7 @@ import { runProjectList } from "./list.js";
 import { runTrackerStatusWithService } from "./status.js";
 import { ServiceClient } from "./service-client.js";
 import { openSchema, controlSchema, runSessionOpen, runSessionControl, coordsSchema, trackSchema, markSchema, runCoordsSet, runTrackCreate, runMarkSet } from './session.js';
+import {exportSchema,frameSchema,runDataExport,runFrameGet} from './output.js';
 
 function toolText(body: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(body) }],
@@ -100,6 +101,8 @@ export function createTrackerMcpServer(client = new ServiceClient()): McpServer 
   register('coords_set',{description:'Set fixed calibration across all frames: origin in image pixels, angle in radians, scale in pixels per world unit. Omitted values are preserved.',inputSchema:coordsSchema},safeTool(args=>runCoordsSet(args,client)));
   register('track_create',{description:'Create a uniquely named point mass. Only point_mass is supported; default mass is 1.',inputSchema:trackSchema},safeTool(args=>runTrackCreate(args,client)));
   register('mark_set',{description:'Set or clear a batch of image-pixel marks. Frame is the video frame number, not clip step. Set requires x and y; clear=true allows frame only. Duplicate frames are rejected before mutation.',inputSchema:markSchema},safeTool(args=>runMarkSet(args,client)));
+  register('data_export',{description:'Export Tracker-computed t,x,y,vx,vy as CSV or JSON. Optional columns preserve order. Omit path for bounded inline data; a new absolute path writes a file. Missing derivatives are blank CSV cells or JSON null.',inputSchema:exportSchema},safeTool(args=>runDataExport(args,client)));
+  register('frame_get',{description:'Extract a video frame as PNG. An omitted path creates a unique OS-temporary output that survives session/service close until you delete it or OS cleanup occurs. Existing files are never overwritten.',inputSchema:frameSchema},safeTool(args=>runFrameGet(args,client)));
   server.server.setRequestHandler(ListToolsRequestSchema,async()=>({tools:definitions}));
   return server;
 }

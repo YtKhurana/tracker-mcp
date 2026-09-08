@@ -23,8 +23,8 @@ export async function runSessionControl(args:unknown, client:RequestClient) {
 }
 
 const boundedNumber=z.number().min(-1e12).max(1e12);
-const frameNumber=z.number().int().min(0).max(99999);
-const trackName=z.string().min(1).max(128).refine(value=>value.trim().length>0&&!value.includes('\0'));
+export const frameNumber=z.number().int().min(0).max(99999);
+export const trackName=z.string().min(1).max(128).refine(value=>value.trim().length>0&&!value.includes('\0'));
 const lengthUnit=z.string().trim().min(1).max(64).refine(value=>!/[\p{Nd}\x00-\x1f\x7f-\x9f]/u.test(value));
 export const coordsSchema=z.strictObject({session_id:sessionId,frame:frameNumber.default(0),origin_x:boundedNumber.optional(),origin_y:boundedNumber.optional(),angle_rad:boundedNumber.optional(),scale:z.number().min(1e-9).max(1e12).optional(),length_unit:lengthUnit.optional()});
 export const trackSchema=z.strictObject({session_id:sessionId,name:trackName,type:z.literal('point_mass').default('point_mass'),mass:z.number().min(1e-30).max(1e12).default(1)});

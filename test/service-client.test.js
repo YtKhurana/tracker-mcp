@@ -6,6 +6,7 @@ import { createServer } from 'node:net';
 import { existsSync, writeFileSync, symlinkSync, unlinkSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { ServiceClient } from '../dist/service-client.js';
+import { ALL_ERROR_CODES } from '../dist/errors.js';
 import { runTrackerStatusWithService } from '../dist/status.js';
 import { makeTrackerBundle } from './helpers/bundle.js';
 
@@ -131,4 +132,16 @@ test('an ambiguous mutation is sent exactly once and its child is terminated', a
   assert.equal(requests[0].method, 'mark');
   assert.equal(f.launches, 1);
   assert.equal(f.child.signalCode, 'SIGKILL');
+});
+test('every frozen error survives TCP, while unknown codes and invalid details are rejected',async t=>{
+  for(const code of ALL_ERROR_CODES) {
+    const result={ok:false,error:{code,message:'specific failure',details:{field:'x'}}};
+    const f=await fixture(t,{response:req=>JSON.stringify({jsonrpc:'2.0',id:req.id,result})+'\n'});
+    assert.deepEqual(await f.client.request('status'),result);
+  }
+  for(const error of [{code:'UNRECOGNIZED',message:'bad',details:{}},{code:'NO_SESSION',message:'bad',details:[]}]) {
+    const f=await fixture(t,{response:req=>JSON.stringify({jsonrpc:'2.0',id:req.id,result:{ok:false,error}})+'\n'});
+    assert.equal((await f.client.request('status')).error.code,'SERVICE_UNAVAILABLE');
+    assert.equal(f.client.snapshot(),null);
+  }
 });

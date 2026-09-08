@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { existsSync,mkdtempSync } from 'node:fs';
+import { existsSync,mkdtempSync,writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { startMcp } from './helpers/mcp.js';
@@ -8,6 +8,9 @@ import { serviceRoot } from './helpers/service.js';
 test('native MCP session busy/save/close/stale/reopen', {skip:process.env.TRACKER_NATIVE_TESTS!=='1',timeout:90000},async()=>{
   const mcp=await startMcp(); const output=mkdtempSync(path.join(tmpdir(),'tracker-session-test-'));
   try {
+    assert.equal((await mcp.call('session_open',{path:path.join(output,'absent.mp4')})).error.code,'NOT_FOUND');
+    const malformed=path.join(output,'malformed.trk');writeFileSync(malformed,'<object');
+    assert.equal((await mcp.call('session_open',{path:malformed})).error.code,'PARSE_FAILED');
     const input=path.join(serviceRoot,'fixtures/official/service-generated.trz');
     const opened=await mcp.call('session_open',{path:input}); assert.equal(opened.ok,true,JSON.stringify(opened));
     const session_id=opened.session_id;
