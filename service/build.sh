@@ -14,4 +14,5 @@ mkdir -p "$SERVICE_DIR/build/classes" "$SERVICE_DIR/build/test-classes"
 "$JDK/bin/javac" -encoding UTF-8 -classpath "$SERVICE_DIR/build/TrackerService.jar:$APP_LIB/*" -d "$SERVICE_DIR/build/test-classes" "$SERVICE_DIR"/test/**/*.java
 "$JDK/bin/java" -classpath "$SERVICE_DIR/build/TrackerService.jar:$SERVICE_DIR/build/test-classes" tracker.mcp.CodecTest
 "$JDK/bin/java" -classpath "$SERVICE_DIR/build/TrackerService.jar:$SERVICE_DIR/build/test-classes" tracker.mcp.ProjectInputTest "$SERVICE_DIR/../fixtures/official/service-generated.trz"
+"$JDK/bin/java" -classpath "$SERVICE_DIR/build/TrackerService.jar:$SERVICE_DIR/build/test-classes:$APP_LIB/*" tracker.mcp.SaveCleanupTest
 print "Built $SERVICE_DIR/build/TrackerService.jar"

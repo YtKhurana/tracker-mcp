@@ -24,7 +24,13 @@ This is a private release candidate, not final v1 acceptance.
 - Dependency advisory scanning was not performed; authorization for submitting
   private dependency metadata to the registry was not obtained.
 
-Human verification of the new artifact remains pending as described in
-[the checkpoint](TRACKER_CHECKPOINT.md). The project requires this before
-starting named jobs D, E, F and G. Existing lower-level tests exercising similar
-operations are not substituted for those ordered acceptance jobs.
+The rc.1 archive failed the official GUI check because its video resource was
+at the ZIP root. It must not be promoted as stable. The reviewed replacement
+uses fixed `project.trk` and `videos/media.mp4` entries, preserves the encoded
+media bytes, and passed focused native save/reopen/path tests.
+
+The owner verified replacement SHA-256
+`e50fb6d38ef7f163de93fd6cd21c0af1ec92ea52dd4902cf4c8f2b80f59809b5`
+in official Tracker: no import, video playback, marker overlap at frames 0 and
+7, and persistence after close/reopen all pass. TASKS 3.1 is complete; Jobs
+D-G and the final full regression remain pending.

@@ -18,6 +18,8 @@ import org.opensourcephysics.media.core.*;
 
 /** GPL-3. Authenticated local numeric Tracker service. All Tracker calls use EDT. */
 public final class TrackerService {
+  @FunctionalInterface interface PublicationHook { void afterLink(Publication publication,int completed) throws IOException; }
+  record Publication(Path source,Path destination) {}
   private volatile boolean poisoned, stopped;
   private volatile Socket active;
   private TFrame frame;
@@ -26,6 +28,9 @@ public final class TrackerService {
   private String session;
   private boolean dirty;
   private final AtomicBoolean busy=new AtomicBoolean();
+  private final PublicationHook publicationHook;
+  TrackerService() { this((publication,completed)->{}); }
+  TrackerService(PublicationHook publicationHook) { this.publicationHook=Objects.requireNonNull(publicationHook); }
   private static Map<String,Object> map(Object... pairs) { Map<String,Object> out=new LinkedHashMap<>(); for(int i=0;i<pairs.length;i+=2)out.put((String)pairs[i],pairs[i+1]); return out; }
   private static Map<String,Object> ok(Object... pairs) { Map<String,Object> out=map(pairs);out.put("ok",true);out.put("visible_windows",Arrays.stream(java.awt.Window.getWindows()).filter(java.awt.Window::isVisible).count());return out; }
   private static Map<String,Object> error(String code,String message) { return map("ok",false,"error",map("code",code,"message",message,"details",map())); }
@@ -215,29 +220,56 @@ public final class TrackerService {
   }
   private Map<String,Object> save(String name) throws Exception {
     String ext=ProjectInput.extension(name);if(!Set.of("trk","trz").contains(ext))throw Failure.invalid("Save path must end in .trk or .trz");
-    Path target=output(name,ext),parent=target.getParent();String base=target.getFileName().toString();base=base.substring(0,base.length()-4);
+    Path target=output(name,ext),parent=target.getParent();String base=safeSaveBase(target);
     Path trk=parent.resolve(base+".trk"),trz=parent.resolve(base+".trz");
     if(Files.exists(trk,LinkOption.NOFOLLOW_LINKS)||Files.exists(trz,LinkOption.NOFOLLOW_LINKS))throw new Failure("SAVE_FAILED","Output already exists");
     String mediaName=base+"-"+UUID.randomUUID()+"."+ProjectInput.extension(input.media.toString());Path mediaOut=parent.resolve(mediaName);
-    Path staging=Files.createTempDirectory(parent,".tracker-save-");List<Path> published=new ArrayList<>();
+    Path staging=Files.createTempDirectory(parent,".tracker-save-");
     try {
-      Files.copy(input.media,staging.resolve(mediaName));
+      Path standalone=Files.createDirectory(staging.resolve("standalone")),archive=Files.createDirectory(staging.resolve("archive"));
+      Path stagedMedia=standalone.resolve(mediaName);Files.copy(input.media,stagedMedia);
       XMLControlElement control=new XMLControlElement(panel);XMLControl video=control.getChildControl("videoclip").getChildControl("video");if(video==null)throw new IOException("Video serialization absent");
-      // Resource normalization only, matching ExportZipDialog and accepted S3 recipe.
+      // Resource normalization only. The standalone project resolves its adjacent companion.
       video.setValue("path",mediaName);video.setValue("paths",null);
-      Path stagedTrk=staging.resolve(trk.getFileName());if(control.write(stagedTrk.toString())==null||Files.size(stagedTrk)==0)throw new IOException("Tracker serialization failed");
-      Path stagedTrz=staging.resolve(trz.getFileName());
-      try(ZipOutputStream zip=new ZipOutputStream(Files.newOutputStream(stagedTrz,StandardOpenOption.CREATE_NEW))){for(Path entry:List.of(stagedTrk,staging.resolve(mediaName))){ZipEntry item=new ZipEntry(entry.getFileName().toString());item.setTime(0);zip.putNextEntry(item);Files.copy(entry,zip);zip.closeEntry();}}
-      publish(staging.resolve(mediaName),mediaOut);published.add(mediaOut);publish(stagedTrk,trk);published.add(trk);publish(stagedTrz,trz);published.add(trz);dirty=false;
+      Path stagedTrk=standalone.resolve(trk.getFileName());if(control.write(stagedTrk.toString())==null||Files.size(stagedTrk)==0)throw new IOException("Tracker serialization failed");
+      // Tracker's project exporter stores archive media under videos/. Serialize a distinct
+      // archive control through Tracker rather than editing XML text; marks are never hand-edited.
+      String archiveProject="project.trk",archiveMedia="videos/media."+ProjectInput.extension(input.media.toString());video.setValue("path",archiveMedia);
+      Path archiveTrk=archive.resolve("project.trk");if(control.write(archiveTrk.toString())==null||Files.size(archiveTrk)==0)throw new IOException("Tracker archive serialization failed");
+      Path stagedTrz=archive.resolve("project.trz");
+      try(ZipOutputStream zip=new ZipOutputStream(Files.newOutputStream(stagedTrz,StandardOpenOption.CREATE_NEW))){
+        ZipEntry projectEntry=new ZipEntry(archiveProject);projectEntry.setTime(0);zip.putNextEntry(projectEntry);Files.copy(archiveTrk,zip);zip.closeEntry();
+        ZipEntry mediaEntry=new ZipEntry(archiveMedia);mediaEntry.setTime(0);zip.putNextEntry(mediaEntry);Files.copy(stagedMedia,zip);zip.closeEntry();
+      }
+      publishSaveArtifacts(List.of(new Publication(stagedMedia,mediaOut),new Publication(stagedTrk,trk),new Publication(stagedTrz,trz)));
       return ok("trk_path",trk.toString(),"trz_path",trz.toString());
-    }catch(Exception failure){for(Path file:published)if(Files.exists(file,LinkOption.NOFOLLOW_LINKS)&&Files.isSameFile(file,staging.resolve(file.getFileName())))Files.delete(file);if(failure instanceof Failure f)throw f;throw new Failure("SAVE_FAILED","Project could not be saved: "+failure.getClass().getSimpleName());}
-    finally{try(var files=Files.list(staging)){for(Path file:files.toList())Files.deleteIfExists(file);}Files.delete(staging);}
+    }catch(Exception failure){if(failure instanceof Failure f)throw f;throw new Failure("SAVE_FAILED","Project could not be saved: "+failure.getClass().getSimpleName());}
+    finally{cleanupStaging(staging);}
+  }
+  void publishSaveArtifacts(List<Publication> artifacts) throws IOException {
+    List<Publication> created=new ArrayList<>();
+    try {
+      for(Publication artifact:artifacts){publish(artifact.source(),artifact.destination());created.add(artifact);publicationHook.afterLink(artifact,created.size());}
+      dirty=false;
+    }catch(IOException|RuntimeException failure){rollbackPublished(created);throw failure;}
+  }
+  static void rollbackPublished(List<Publication> created) {
+    for(int i=created.size()-1;i>=0;i--){Publication artifact=created.get(i);try{Path file=artifact.destination(),source=artifact.source();if(Files.exists(file,LinkOption.NOFOLLOW_LINKS)&&Files.exists(source,LinkOption.NOFOLLOW_LINKS)&&Files.isSameFile(file,source))Files.delete(file);}catch(IOException failure){System.err.println("Save rollback cleanup failed: "+failure.getClass().getSimpleName());}}
+  }
+  static void cleanupStaging(Path staging) {
+    try(var files=Files.walk(staging)){for(Path file:files.sorted(Comparator.reverseOrder()).toList())try{Files.deleteIfExists(file);}catch(IOException failure){System.err.println("Save staging cleanup failed: "+failure.getClass().getSimpleName());}}
+    catch(IOException failure){System.err.println("Save staging listing failed: "+failure.getClass().getSimpleName());}
   }
   private static Path output(String name,String extension) throws IOException {
     try {
       Path path=Path.of(name);if(!path.isAbsolute()||!ProjectInput.extension(name).equals(extension))throw Failure.invalid("Output must be an absolute ."+extension+" path");
       Path parent=path.getParent().toRealPath();path=parent.resolve(path.getFileName());if(Files.exists(path,LinkOption.NOFOLLOW_LINKS))throw new Failure("SAVE_FAILED","Output already exists");return path;
     }catch(InvalidPathException failure){throw Failure.invalid("Invalid output path");}catch(IOException failure){throw new Failure("SAVE_FAILED","Output directory is unavailable");}
+  }
+  private static String safeSaveBase(Path target) {
+    String filename=target.getFileName().toString(),base=filename.substring(0,filename.length()-4);
+    if(!base.matches("[A-Za-z0-9](?:[A-Za-z0-9._ -]{0,126}[A-Za-z0-9])?"))throw Failure.invalid("Save filename stem must use 1-128 portable characters");
+    return base;
   }
   private void publish(Path staging,Path destination) throws IOException {if(poisoned||stopped)throw new Failure("TIMEOUT","Operation cancelled before publication");Files.createLink(destination,staging);}
   private void writeAtomic(Path destination,byte[] bytes) throws IOException {
