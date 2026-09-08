@@ -85,10 +85,10 @@ test("stdio MCP initialize and tools/list", async () => {
     const listed = await readJsonLine(child);
     assert.equal(listed.id, 2);
     assert.equal(listed.error, undefined, JSON.stringify(listed.error));
-    assert.equal(listed.result.tools.length, 4);
+    assert.equal(listed.result.tools.length, 9);
     assert.deepEqual(
       listed.result.tools.map((tool) => tool.name),
-      ["tracker_status", "project_list", "project_inspect", "data_read"],
+      ["tracker_status", "project_list", "project_inspect", "data_read", "session_open", "session_control", "coords_set", "track_create", "mark_set"],
     );
     child.stdin.write("not-json\n");
     send(child, { jsonrpc: "2.0", id: 3, method: "tools/list" });
