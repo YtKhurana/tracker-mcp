@@ -1,8 +1,13 @@
 # Official Tracker checkpoint
 
-Status: pending human work. Java-generated candidates and analytical checks
-are available. This is the required independent check before v1 tools are
-implemented and a completed v1 release is published.
+Status: official CSV and repaired project received and checked. Untouched
+copies and evidence are in `fixtures/official/`. The remaining check is the
+original service-generated artifact: quit Tracker normally, relaunch it,
+and open the original `service/build/spikes/s3-final/minimal.trz` before any
+raw MP4. Report whether the video loads without warning; do not overwrite it.
+The repaired project does not substitute for this S3 exit check.
+
+The original checkpoint procedure is retained below for future regenerations.
 
 Run `npm run checkpoint` to generate a fresh directory, or use the current
 local directory `service/build/spikes/s3-final/`.
@@ -15,7 +20,7 @@ local directory `service/build/spikes/s3-final/`.
    marker is **(48,190)**; frame 7 is **(167,141)**. The full list is in
    `fixtures/golden/manifest.json`.
 3. Export the synthetic mass's table with **t,x,y,vx,vy**, all rows, preferably
-   at least **9 significant digits**. Save the untouched export as
+   **Full Precision** (observed: seven significant digits in Tracker 6.3.5). Save the untouched export as
    `official.csv` beside the candidates. Keep blank derivative endpoints.
 4. Save the verified project as `official.trz` in that same directory.
 5. Report the directory, which candidate shapes worked, the Tracker version,

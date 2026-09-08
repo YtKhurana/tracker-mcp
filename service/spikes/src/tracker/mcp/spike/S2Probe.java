@@ -246,9 +246,11 @@ public final class S2Probe {
   }
 
   private static void captureFrames(Video video, Path outputDir, LoadState state) throws IOException {
+    // Loaded projects retain their saved current frame; request zero explicitly.
+    video.setFrameNumber(0);
     BufferedImage frame0 = video.getImage();
-    if (frame0 == null) {
-      throw new IOException("initial frame image is null");
+    if (frame0 == null || video.getFrameNumber() != 0) {
+      throw new IOException("initial seek to frame 0 failed");
     }
     state.frame0Path = writePng(frame0, outputDir.resolve("frame0.png"));
     state.frame0BrightCenter = brightCenter(frame0);

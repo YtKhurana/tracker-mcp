@@ -4,7 +4,8 @@ A local stdio MCP server for inspecting Tracker video-analysis projects.
 
 **Current status:** four read-only v0 tools work. Java experiments also create
 calibrated point-mass projects and CSVs, but the seven v1 session tools are
-pending the official Tracker verification checkpoint. This is not a finished
+pending the service-generated archive opening checkpoint. Official reference
+CSV and a human-saved project are preserved in `fixtures/official/`. This is not a finished
 v1 release.
 
 ## Install and run
@@ -52,6 +53,12 @@ coordinate setter takes radians.
 npm test
 npm run typecheck
 npm pack
+```
+
+Native regression against the official project (macOS with Tracker installed):
+
+```sh
+TRACKER_NATIVE_TESTS=1 node --test test/official-reload.test.js
 ```
 
 The fixture-generation test needs Python 3, NumPy 2.2.6 and OpenCV 4.12.0.
