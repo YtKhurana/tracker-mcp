@@ -7,8 +7,9 @@ pass. After building the jar,
 All seven v1 MCP operations are registered alongside the four read-only tools.
 Job C has passed its official-app checkpoint. Job D's native
 reopen/export/save/close acceptance and independent reviews pass. Job E
-replays the approved one-frame clear/correction in isolated owners. Jobs F-G
-remain pending.
+replays the approved one-frame clear/correction in isolated owners. Job F's
+reviewed acceptance creates and verifies two isolated point masses from the
+pinned raw fixture in three fresh owners. Job G remains pending.
 
 ```sh
 ./service/build.sh
@@ -57,6 +58,29 @@ the independent calibrated world-coordinate and central-difference oracle,
 the exact `project.trk` + `videos/media.mp4` archive layout, and unchanged
 media bytes. `run.json` is exclusive-created only after both owner pairs have
 exited.
+
+Replay Job F from the pinned raw video into a new, previously nonexistent run
+directory:
+
+```sh
+npm run build:service
+npm run build
+npm run job:f -- \
+  "$PWD/fixtures/golden/synthetic-parabola.mp4" \
+  "/absolute/new/job-f-run"
+```
+
+Job F verifies raw-video and `job-f-manifest.json` SHA-256 provenance, creates
+the `parabolic target` and `linear reference` point masses with their exact
+masses and marks, exports each table independently, and saves
+`two-point-masses.trk`/`.trz` plus its UUID-named companion video. It then
+reopens the standalone `.trk` with its companion in one fresh MCP/service
+owner and the archive alone after relocation in another. Each export is checked
+against the independent calibrated coordinate and immediate-neighbour
+central-difference oracle. `data_read` confirms per-track mark membership in
+both project forms; the archive must contain exactly `project.trk` and
+`videos/media.mp4`. Raw media, embedded media and companion media hashes must
+match. `run.json` is exclusive-created only after all three owner pairs exit.
 
 `build.sh` uses the installed app compiler and creates
 `service/build/TrackerService.jar`. The portable codec/import tests require

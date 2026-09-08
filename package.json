@@ -6,7 +6,7 @@
   "description": "Local 11-tool MCP server for Tracker video analysis, with a separate GPL-3 Java service.",
   "license": "GPL-3.0-only",
   "repository": {"type":"git","url":"git+https://github.com/YtKhurana/tracker-mcp.git"},
-  "files": ["dist", "src", "tsconfig.json", "README.md", "CHANGELOG.md", "docs", "service/src", "service/test", "service/build.sh", "service/LICENSE", "service/README.md", "service/PROTOCOL.md", "scripts/run-job-c.mjs", "scripts/run-job-d.mjs", "scripts/run-job-e.mjs", "scripts/verify-official.mjs", "scripts/test-service-unit.mjs", "fixtures/golden", "fixtures/official"],
+  "files": ["dist", "src", "tsconfig.json", "README.md", "CHANGELOG.md", "docs", "service/src", "service/test", "service/build.sh", "service/LICENSE", "service/README.md", "service/PROTOCOL.md", "scripts/run-job-c.mjs", "scripts/run-job-d.mjs", "scripts/run-job-e.mjs", "scripts/run-job-f.mjs", "scripts/verify-official.mjs", "scripts/test-service-unit.mjs", "fixtures/golden", "fixtures/official"],
   "engines": {
     "node": ">=20"
   },
@@ -24,7 +24,8 @@
     "checkpoint": "node scripts/prepare-checkpoint.mjs",
     "job:c": "node scripts/run-job-c.mjs",
     "job:d": "node scripts/run-job-d.mjs",
-    "job:e": "node scripts/run-job-e.mjs"
+    "job:e": "node scripts/run-job-e.mjs",
+    "job:f": "node scripts/run-job-f.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.30.0",

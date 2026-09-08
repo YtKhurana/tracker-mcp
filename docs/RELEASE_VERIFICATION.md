@@ -58,5 +58,19 @@ the saved archive cleanly. Both owners and the injected-failure owner are
 reaped before evidence publication; a baseline changed before final
 publication is rejected. Focused native Job E checks pass 8/8. Fresh fault,
 code, security, and test reviews passed after one narrow fix and finding-only
-rechecks. TASKS 3.3 is complete; Jobs F-G and the final full regression remain
-pending.
+rechecks. TASKS 3.3 is complete.
+
+TASKS 3.4 Job F starts from the SHA-pinned raw fixture and exact pinned
+two-track manifest. It creates `parabolic target` (mass 1.25, 12 marks) and
+`linear reference` (mass 2.75, 10 distinct marks), then validates separate
+exports against independent calibrated position and central-difference
+velocity oracles, including a closed-form linear velocity check. A fresh owner
+reopens the standalone `.trk`; another relocates and reopens the `.trz` alone.
+All six exports retain the correct track membership without cross-contamination,
+both project forms preserve the exact marks/masses, and raw, companion, and
+embedded media bytes match. All three owner pairs are distinct and reaped;
+injected failures and final provenance tampering suppress `run.json`. Focused
+native Job F checks pass 6/6. Fresh fault, code, security, and test reviews
+passed after pinning the approved manifest digest in the single fix pass and
+rechecking that finding. TASKS 3.4 is complete; Job G and the final full
+regression remain pending.

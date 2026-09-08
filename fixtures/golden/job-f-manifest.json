@@ -1,0 +1,53 @@
+{
+  "fixture_id": "job-f-two-point-masses-v1",
+  "raw_video": {
+    "path": "synthetic-parabola.mp4",
+    "sha256": "2011c8bc38a512bceae19bc7d58bbe84aeb53443be2647b7a0408f574bbf9434"
+  },
+  "calibration": {
+    "origin_x": 96,
+    "origin_y": 168,
+    "angle_rad": 0.5235987755982988,
+    "scale": 40,
+    "length_unit": "m",
+    "frame_interval_seconds": 0.1
+  },
+  "tracks": [
+    {
+      "name": "parabolic target",
+      "type": "point_mass",
+      "mass": 1.25,
+      "marks": [
+        {"frame": 0, "x": 48, "y": 190},
+        {"frame": 1, "x": 59, "y": 183},
+        {"frame": 2, "x": 72, "y": 176},
+        {"frame": 3, "x": 87, "y": 169},
+        {"frame": 4, "x": 104, "y": 162},
+        {"frame": 5, "x": 123, "y": 155},
+        {"frame": 6, "x": 144, "y": 148},
+        {"frame": 7, "x": 167, "y": 141},
+        {"frame": 8, "x": 192, "y": 134},
+        {"frame": 9, "x": 219, "y": 127},
+        {"frame": 10, "x": 248, "y": 120},
+        {"frame": 11, "x": 279, "y": 113}
+      ]
+    },
+    {
+      "name": "linear reference",
+      "type": "point_mass",
+      "mass": 2.75,
+      "marks": [
+        {"frame": 0, "x": 280, "y": 42},
+        {"frame": 1, "x": 271, "y": 48},
+        {"frame": 2, "x": 262, "y": 54},
+        {"frame": 3, "x": 253, "y": 60},
+        {"frame": 5, "x": 235, "y": 72},
+        {"frame": 6, "x": 226, "y": 78},
+        {"frame": 7, "x": 217, "y": 84},
+        {"frame": 9, "x": 199, "y": 96},
+        {"frame": 10, "x": 190, "y": 102},
+        {"frame": 11, "x": 181, "y": 108}
+      ]
+    }
+  ]
+}
