@@ -72,5 +72,19 @@ embedded media bytes match. All three owner pairs are distinct and reaped;
 injected failures and final provenance tampering suppress `run.json`. Focused
 native Job F checks pass 6/6. Fresh fault, code, security, and test reviews
 passed after pinning the approved manifest digest in the single fix pass and
-rechecking that finding. TASKS 3.4 is complete; Job G and the final full
-regression remain pending.
+rechecking that finding. TASKS 3.4 is complete.
+
+TASKS 3.5 Job G starts from the pinned raw fixture and exact fixture-specific
+detector manifest. It calls `frame_get` in the sequence 0 → 7 → 0, validates
+bounded PNG structure before decode, derives marker centroids from the actual
+returned RGBA pixels, and constructs `mark_set` only from those evidence
+records. The two saved marks and independent world-coordinate export persist
+through an archive-only relocation and a distinct fresh owner. A substituted
+valid frame-0 PNG at the frame-7 step changes the derived result and aborts
+before marking, saving, or evidence publication, proving that the returned
+image bytes drive the write path. Media/layout/provenance and both owner pairs
+are verified and reaped. Focused native Job G checks pass 10/10. Fresh fault,
+code, security, and test reviews passed after one pre-decode IHDR-bound fix and
+finding-only rechecks. This proves only the pinned fixture-assisted loop, not
+general visual tracking accuracy. TASKS 3.5 and the Slice 3 success metric are
+complete; the final whole-project regression and release packaging remain.

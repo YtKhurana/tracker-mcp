@@ -86,6 +86,9 @@ npm run typecheck
 npm run test:service-unit
 TRACKER_NATIVE_TESTS=1 npm test
 npm run job:c -- /absolute/path/to/a-new-output-directory
+npm run job:g -- \
+  /absolute/path/to/synthetic-parabola.mp4 \
+  /absolute/path/to/a-new-job-g-output-directory
 npm pack
 ```
 
@@ -93,6 +96,8 @@ Job C uses an SDK client to create a fresh project from numeric fixture inputs,
 checks all 12 marks, compares CSV to the frozen official export and records
 artifact hashes in run.json. Official-app verification remains a separate
 [checkpoint](docs/TRACKER_CHECKPOINT.md); automated comparison does not replace it.
+Job G is a separate bounded frame-assisted replay: it decodes only the pinned
+fixture's marker PNGs and explicitly does not claim general-purpose vision.
 
 Fixture regeneration tests need Python 3, NumPy 2.2.6 and
 OpenCV opencv-python-headless==4.12.0.88. Hosted CI runs portable checks on

@@ -9,7 +9,8 @@ Job C has passed its official-app checkpoint. Job D's native
 reopen/export/save/close acceptance and independent reviews pass. Job E
 replays the approved one-frame clear/correction in isolated owners. Job F's
 reviewed acceptance creates and verifies two isolated point masses from the
-pinned raw fixture in three fresh owners. Job G remains pending.
+pinned raw fixture in three fresh owners. Job G's reviewed acceptance derives
+marks from bounded decoded frame pixels and persists them across relocation.
 
 ```sh
 ./service/build.sh
@@ -81,6 +82,31 @@ central-difference oracle. `data_read` confirms per-track mark membership in
 both project forms; the archive must contain exactly `project.trk` and
 `videos/media.mp4`. Raw media, embedded media and companion media hashes must
 match. `run.json` is exclusive-created only after all three owner pairs exit.
+
+Replay the bounded Job G frame-assisted loop from the pinned raw video into a
+new, previously nonexistent run directory:
+
+```sh
+npm run build:service
+npm run build
+npm run job:g -- \
+  "$PWD/fixtures/golden/synthetic-parabola.mp4" \
+  "/absolute/new/job-g-run"
+```
+
+Job G opens the raw fixture in a fresh owner, calibrates it, requests frames
+`0`, `7`, then `0` again, and records each canonical PNG's hash, size,
+dimensions, mask, raw centroid and rounded point. Its `pngjs` color mask is
+strictly fixture-only—not general vision—and accepts one 320×240 RGBA marker
+mask only. The submitted frame 0 and frame 7 marks are derived from the first
+two evidence records, including their source ordinals and hashes. It verifies
+the two independent world-position rows, saves the `.trk`, `.trz`, and
+UUID-named media, then relocates the archive alone to a distinct fresh owner
+for export/read-back. It requires exactly `project.trk` plus
+`videos/media.mp4` in the archive and publishes `run.json` only after both
+MCP/Java owner pairs have exited. Focused native acceptance passes 10/10. The
+four independent reviews passed after the one pre-decode IHDR-bound fix and
+finding-only rechecks; its detector claim remains fixture-specific.
 
 `build.sh` uses the installed app compiler and creates
 `service/build/TrackerService.jar`. The portable codec/import tests require

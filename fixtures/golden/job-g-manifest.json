@@ -1,0 +1,27 @@
+{
+  "fixture_id": "job-g-frame-assisted-point-mass-v1",
+  "raw_video": {
+    "path": "synthetic-parabola.mp4",
+    "sha256": "2011c8bc38a512bceae19bc7d58bbe84aeb53443be2647b7a0408f574bbf9434"
+  },
+  "calibration": {
+    "origin_x": 96,
+    "origin_y": 168,
+    "angle_rad": 0.5235987755982988,
+    "scale": 40,
+    "length_unit": "m",
+    "frame_interval_seconds": 0.1
+  },
+  "sequence": [
+    {"frame": 0, "expected_point": [48, 190]},
+    {"frame": 7, "expected_point": [167, 141]},
+    {"frame": 0, "expected_point": [48, 190]}
+  ],
+  "track": {"name": "frame-assisted target", "type": "point_mass", "mass": 1},
+  "detector": {
+    "scope": "fixture-only",
+    "note": "This bounded color-mask check proves the Job G frame-assisted loop; it is not general vision.",
+    "png": {"width": 320, "height": 240, "rgba": true},
+    "mask": {"alpha": 255, "red_gt": 180, "green_gt": 160, "blue_lt": 140, "count_min": 150, "count_max": 260, "bbox_min": 15, "bbox_max": 19}
+  }
+}
