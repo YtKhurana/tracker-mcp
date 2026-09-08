@@ -32,5 +32,17 @@ media bytes, and passed focused native save/reopen/path tests.
 The owner verified replacement SHA-256
 `e50fb6d38ef7f163de93fd6cd21c0af1ec92ea52dd4902cf4c8f2b80f59809b5`
 in official Tracker: no import, video playback, marker overlap at frames 0 and
-7, and persistence after close/reopen all pass. TASKS 3.1 is complete; Jobs
-D-G and the final full regression remain pending.
+7, and persistence after close/reopen all pass. TASKS 3.1 is complete.
+
+TASKS 3.2 Job D passes focused native checks through a fresh stdio MCP and
+newly owned Java service. The SHA-pinned artifact was copied by itself to a
+new relocation directory, reopened cleanly, reported the same fixed calibration and one
+12-mark point mass, exported `t,x,y,vx,vy`, saved to new `.trk`/`.trz`/media
+paths, and closed. The saved archive retains root `project.trk` plus
+`videos/media.mp4`; its embedded media bytes match the verified input. CSV
+columns, 12-row membership, four endpoint blanks and all 56 finite cells match
+the Job C export, with reload-only floating-point differences below the
+predeclared `1e-9` absolute bound. The native acceptance and injected-error
+cleanup paths pass 6/6. Fresh independent fault, code, security, and test
+reviews passed after one consolidated fix and finding-only rechecks. TASKS 3.2
+is complete; Jobs E-G and the final full regression remain pending.

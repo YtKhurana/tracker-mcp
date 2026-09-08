@@ -5,7 +5,9 @@ documented in [PROTOCOL.md](PROTOCOL.md). Native service and lifecycle checks
 pass. After building the jar,
 `tracker_status(probe_service=true)` starts and checks one owned service.
 All seven v1 MCP operations are registered alongside the four read-only tools.
-Final named-job acceptance still requires the official-app checkpoint.
+Job C has passed its official-app checkpoint. Job D's native
+reopen/export/save/close acceptance and independent reviews pass. Jobs E-G
+remain pending.
 
 ```sh
 ./service/build.sh
@@ -14,6 +16,25 @@ TRACKER_NATIVE_TESTS=1 node --test test/service-native.test.js
 TRACKER_NATIVE_TESTS=1 node --test test/service-lifecycle-native.test.js
 TRACKER_NATIVE_TESTS=1 node --test test/mcp-service-native.test.js
 ```
+
+Replay Job D against the exact human-verified Job C artifact into a new,
+previously nonexistent run directory:
+
+```sh
+npm run build:service
+npm run build
+npm run job:d -- \
+  "$PWD/service/build/final-mcp-v1-videos-layout/golden.trz" \
+  "/absolute/new/job-d-run"
+```
+
+The runner verifies SHA-256
+`e50fb6d38ef7f163de93fd6cd21c0af1ec92ea52dd4902cf4c8f2b80f59809b5`,
+copies only that archive into an isolated relocation directory, starts a fresh
+stdio MCP/service process, checks status, exports CSV, saves new project
+artifacts, closes the session, and writes `run.json`. It requires the adjacent
+Job C `run.json` to identify a SHA-pinned baseline CSV and refuses to reuse an
+existing run directory.
 
 `build.sh` uses the installed app compiler and creates
 `service/build/TrackerService.jar`. The portable codec/import tests require
