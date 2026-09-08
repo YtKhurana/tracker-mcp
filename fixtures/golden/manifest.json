@@ -1,0 +1,134 @@
+{
+  "artifacts": {
+    "analytical-expected.csv": "5a0dbd9206e56056dd9c174da477c259860cdbbc5600db81c57da118db0b94ef",
+    "frames": "9c85172f76dfdc66c82fcc449c7df425550044f48c5b050a8e08f2fd8192ed21",
+    "synthetic-parabola.mp4": "2011c8bc38a512bceae19bc7d58bbe84aeb53443be2647b7a0408f574bbf9434"
+  },
+  "calibration": {
+    "angle_rad": 0.5235987755982988,
+    "frame": 0,
+    "length_unit": "m",
+    "origin_x": 96,
+    "origin_y": 168,
+    "scale_px_per_world_unit": 40.0
+  },
+  "fixture_id": "synthetic-parabola-v1",
+  "generator": {
+    "numpy": "2.2.6",
+    "opencv": "4.12.0",
+    "python": "3.13.3",
+    "script": "scripts/generate-golden-fixture.py"
+  },
+  "mutation_cases": {
+    "correction": {
+      "frame": 7,
+      "replacement": {
+        "x": 180,
+        "y": 137
+      }
+    },
+    "gap": {
+      "clear_frames": [
+        5,
+        6
+      ]
+    }
+  },
+  "provenance": {
+    "description": "Generated moving-dot test media; no third-party footage.",
+    "kind": "deterministic_synthetic_media",
+    "rights": "CC0-1.0"
+  },
+  "references": {
+    "analytical": {
+      "notes": "Positions and continuous polynomial velocities; Tracker finite-difference endpoints may differ.",
+      "path": "analytical-expected.csv",
+      "status": "not_official_tracker_oracle"
+    },
+    "official": {
+      "csv_path": null,
+      "status": "pending_human_tracker_checkpoint",
+      "trz_path": null
+    }
+  },
+  "track": {
+    "marks": [
+      {
+        "frame": 0,
+        "x": 48,
+        "y": 190
+      },
+      {
+        "frame": 1,
+        "x": 59,
+        "y": 183
+      },
+      {
+        "frame": 2,
+        "x": 72,
+        "y": 176
+      },
+      {
+        "frame": 3,
+        "x": 87,
+        "y": 169
+      },
+      {
+        "frame": 4,
+        "x": 104,
+        "y": 162
+      },
+      {
+        "frame": 5,
+        "x": 123,
+        "y": 155
+      },
+      {
+        "frame": 6,
+        "x": 144,
+        "y": 148
+      },
+      {
+        "frame": 7,
+        "x": 167,
+        "y": 141
+      },
+      {
+        "frame": 8,
+        "x": 192,
+        "y": 134
+      },
+      {
+        "frame": 9,
+        "x": 219,
+        "y": 127
+      },
+      {
+        "frame": 10,
+        "x": 248,
+        "y": 120
+      },
+      {
+        "frame": 11,
+        "x": 279,
+        "y": 113
+      }
+    ],
+    "mass": 1.0,
+    "name": "synthetic mass",
+    "type": "point_mass"
+  },
+  "video": {
+    "encoded": {
+      "codec_reported_after_decode": "FMP4",
+      "codec_requested": "mp4v",
+      "container": "mp4"
+    },
+    "fps": 10.0,
+    "frame_count": 12,
+    "frame_interval_seconds": 0.1,
+    "height": 240,
+    "path": "synthetic-parabola.mp4",
+    "width": 320
+  }
+}

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Local stdio MCP sidecar for Tracker projects. JSON/file only — does not link tracker.jar.",
+  "files": ["dist", "src", "README.md", "service/LICENSE"],
   "engines": {
     "node": ">=18"
   },
@@ -14,7 +15,9 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
-    "test": "npm run build && node --test test/*.test.js"
+    "test": "npm run build && node --test test/*.test.js",
+    "prepack": "npm run build",
+    "checkpoint": "node scripts/prepare-checkpoint.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
