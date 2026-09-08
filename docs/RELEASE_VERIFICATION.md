@@ -45,4 +45,18 @@ the Job C export, with reload-only floating-point differences below the
 predeclared `1e-9` absolute bound. The native acceptance and injected-error
 cleanup paths pass 6/6. Fresh independent fault, code, security, and test
 reviews passed after one consolidated fix and finding-only rechecks. TASKS 3.2
-is complete; Jobs E-G and the final full regression remain pending.
+is complete.
+
+TASKS 3.3 Job E reopens that same pinned Job C archive, clears frame 5, and
+replaces frame 7 from `(167,141)` to `(180,137)` through `mark_set`. Its
+independent calibration and central-difference oracle verifies the exact 11
+retained rows, derivative blanks at frames 0, 4, 6, and 11, unchanged frame-7
+velocity, and the expected frame-8 velocity change within `1e-9`. The corrected
+`.trk` and `.trz` preserve exactly those marks, their companion/archive media
+bytes and accepted archive layout, and a distinct fresh MCP/Java owner reopens
+the saved archive cleanly. Both owners and the injected-failure owner are
+reaped before evidence publication; a baseline changed before final
+publication is rejected. Focused native Job E checks pass 8/8. Fresh fault,
+code, security, and test reviews passed after one narrow fix and finding-only
+rechecks. TASKS 3.3 is complete; Jobs F-G and the final full regression remain
+pending.

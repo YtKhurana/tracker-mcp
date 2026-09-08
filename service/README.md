@@ -6,7 +6,8 @@ pass. After building the jar,
 `tracker_status(probe_service=true)` starts and checks one owned service.
 All seven v1 MCP operations are registered alongside the four read-only tools.
 Job C has passed its official-app checkpoint. Job D's native
-reopen/export/save/close acceptance and independent reviews pass. Jobs E-G
+reopen/export/save/close acceptance and independent reviews pass. Job E
+replays the approved one-frame clear/correction in isolated owners. Jobs F-G
 remain pending.
 
 ```sh
@@ -35,6 +36,27 @@ stdio MCP/service process, checks status, exports CSV, saves new project
 artifacts, closes the session, and writes `run.json`. It requires the adjacent
 Job C `run.json` to identify a SHA-pinned baseline CSV and refuses to reuse an
 existing run directory.
+
+Replay Job E against that same exact human-verified Job C artifact into a new,
+previously nonexistent run directory:
+
+```sh
+npm run build:service
+npm run build
+npm run job:e -- \
+  "$PWD/service/build/final-mcp-v1-videos-layout/golden.trz" \
+  "/absolute/new/job-e-run"
+```
+
+Job E rechecks the source and Job C CSV provenance hashes, copies the archive
+alone into `relocated-input`, clears frame 5 and replaces frame 7 with
+`(180,137)` in one fresh stdio MCP/service owner, and writes the corrected
+CSV/project/media only to `mutation-output`. It then opens that archive through
+a distinct fresh MCP/service owner and exports to `reopen-output`. It checks
+the independent calibrated world-coordinate and central-difference oracle,
+the exact `project.trk` + `videos/media.mp4` archive layout, and unchanged
+media bytes. `run.json` is exclusive-created only after both owner pairs have
+exited.
 
 `build.sh` uses the installed app compiler and creates
 `service/build/TrackerService.jar`. The portable codec/import tests require
