@@ -1,24 +1,41 @@
 # tracker-mcp
 
-A local stdio MCP server for inspecting Tracker video-analysis projects.
+A local 11-tool stdio MCP server for Tracker video analysis. A TypeScript
+sidecar talks to a separate GPL-3 Java service using your installed Tracker
+runtime. No Tracker or Xuggle binaries are redistributed.
 
-**Current status:** four read-only v0 tools work. Java experiments also create
-calibrated point-mass projects and CSVs, but the seven v1 session tools are
-under implementation after the completed S3 checkpoint. Official reference
-CSV and checked archives are preserved in `fixtures/official/`. This is not a finished
-v1 release.
+**0.2.0-rc.1:** all 11 tools are implemented. The latest full native run passed
+108 of 109 tests; the corrupt-video test returned TIMEOUT instead of
+VIDEO_DECODE. See [release verification](docs/RELEASE_VERIFICATION.md).
+The new final artifact's official-app visual check and subsequent named job
+acceptance gates remain pending. This is a release candidate, not a claim
+that every v1 acceptance gate has passed.
 
-## Install and run
+## Install
 
-Requires Node.js 20 or 22 and npm. Clone this repository, then run:
+Requires Node.js 20+, npm, macOS with a display session, and Tracker.app
+(tested with 6.3.5 and its bundled Java 21). Read-only project tools do not
+require Java. TRACKER_APP can override /Applications/Tracker.app.
+
+From source:
 
 ```sh
-npm ci
+npm ci --no-audit
 npm run build
-npm start
+npm run build:service
 ```
 
-The server uses stdio; launch it from an MCP host. For example:
+For the private GitHub release tarball, install the downloaded local archive
+in a new directory:
+
+```sh
+npm install /absolute/path/tracker-mcp-0.2.0-rc.1.tgz --no-audit
+npm run build:service --prefix node_modules/tracker-mcp
+```
+
+The tarball includes compiled sidecar code; build the Java service locally
+against your app. Do not move an installation while its service runs.
+Configure an MCP host with the absolute installed dist/index.js path:
 
 ```json
 {
@@ -31,61 +48,61 @@ The server uses stdio; launch it from an MCP host. For example:
 }
 ```
 
-The sidecar writes only protocol messages to stdout. Tool inputs use absolute
-filesystem paths. Tool errors use `{ok:false,error:{code,message,details}}`.
+Only protocol messages go to stdout. Java starts lazily and exits when its
+owning sidecar closes. One session and one request run at a time.
 
-| Tool | Input | Result |
-| --- | --- | --- |
-| `tracker_status` | optional `probe_service` | Tracker.app's bundled JRE and Xuggle locations; service is null in v0 |
-| `project_list` | `dir`, optional `recursive` | `.trk`/`.trz` paths and sizes |
-| `project_inspect` | `path` | Video metadata, stored coordinates, tracks, mark counts and units |
-| `data_read` | `path`, optional `track`, `format` | Existing CSV data or image-pixel marks from a project |
+## Tools
 
-`project_list`, `project_inspect`, and `data_read` do not need Java. Runtime
-discovery defaults to `/Applications/Tracker.app`; `TRACKER_APP` overrides it.
-The v0 sidecar never starts Java or computes Tracker velocities. XML inspection
-returns stored values; serialized angles may use degrees even though the Java
-coordinate setter takes radians.
+| Tool | Purpose |
+| --- | --- |
+| tracker_status | Discover app runtime; optionally start/probe the service |
+| project_list | Find local .trk and .trz files |
+| project_inspect | Inspect stored video, coordinates, tracks and units |
+| data_read | Read existing CSV or image-pixel marks without Java |
+| session_open | Open supported local video or point-mass project |
+| session_control | Status, save or close the session |
+| coords_set | Set fixed origin, radian angle, scale and length unit |
+| track_create | Create a point mass |
+| mark_set | Set, replace or clear image-pixel marks |
+| data_export | Export Tracker-computed CSV or JSON |
+| frame_get | Save a decoded frame as PNG |
 
-## Development and packaging
+Use the advertised MCP input schemas for exact parameters. The workflow is
+open → calibrate → create point mass → mark → export → save → close.
+Inputs and explicit outputs are absolute local paths. Outputs never overwrite
+existing files. Saves produce .trk, .trz and companion media; use .trz for
+portable handoff. See [file lifetimes](docs/HANDOFF.md) and
+[structured errors](docs/ERRORS.md).
+
+Only fixed calibration and point masses are supported for editing. Unsupported
+analysis settings fail explicitly; center of mass and autotracking are outside
+v1. Read-only XML inspection reports stored values, not computed velocities.
+
+## Verification and packaging
 
 ```sh
 npm test
 npm run typecheck
+npm run test:service-unit
+TRACKER_NATIVE_TESTS=1 npm test
+npm run job:c -- /absolute/path/to/a-new-output-directory
 npm pack
 ```
 
-Native regression against the official project (macOS with Tracker installed):
+Job C uses an SDK client to create a fresh project from numeric fixture inputs,
+checks all 12 marks, compares CSV to the frozen official export and records
+artifact hashes in run.json. Official-app verification remains a separate
+[checkpoint](docs/TRACKER_CHECKPOINT.md); automated comparison does not replace it.
 
-```sh
-TRACKER_NATIVE_TESTS=1 node --test test/official-reload.test.js
-```
+Fixture regeneration tests need Python 3, NumPy 2.2.6 and
+OpenCV opencv-python-headless==4.12.0.88. Hosted CI runs portable checks on
+Node 20/22; native tests require the app and display session. Green hosted CI
+alone does not establish native video or official-app correctness.
 
-The fixture-generation test needs Python 3, NumPy 2.2.6 and OpenCV 4.12.0.
-Install the development dependencies with
-`python3 -m pip install numpy==2.2.6 opencv-python-headless==4.12.0.88`.
-CI runs the portable tests and package build on Node 20/22. Checks requiring
-Tracker.app or the sibling Tracker source/examples are explicitly skipped
-when unavailable. A green hosted CI run does not establish native video or
-official-app correctness; those checks run locally with Tracker 6.3.5.
-
-`npm pack` builds a v0 sidecar tarball containing compiled code and TypeScript
-source. It excludes the Java experiments and app jars. The package remains
-private until the release gates are complete.
-
-## Java experiments and human checkpoint
-
-See [service/README.md](service/README.md) for the bundled-JRE build/run
-commands and [the checkpoint instructions](docs/TRACKER_CHECKPOINT.md).
-`npm run checkpoint` prepares fresh artifacts and checks analytical values;
-it requires a macOS display session and the installed Tracker app runtime.
-
-The planned v1 workflow is open → calibrate → create point mass → mark →
-export → save → close, with a total of 11 MCP tools. Official Tracker must
-open the output and export a matching table before that work can be marked
-complete. Center of mass and autotracking remain outside v1.
-
-TrackerService experiments are GPL-3; see [service/LICENSE](service/LICENSE).
-Tracker and Xuggle binaries are provided by the user's Tracker installation
-and are not redistributed here. Synthetic fixture media is generated from
-numeric inputs; its provenance is recorded in `fixtures/golden/manifest.json`.
+The package includes TypeScript and GPL-3 service source, fixtures, documentation
+and build/replay scripts. It excludes compiled Java/app jars and experiment
+outputs. Distribution remains in the existing private GitHub repository, not
+public npm. See [service documentation](service/README.md),
+[protocol](service/PROTOCOL.md), [license](service/LICENSE) and
+[changelog](CHANGELOG.md). Synthetic media provenance is in
+fixtures/golden/manifest.json.

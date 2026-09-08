@@ -1,28 +1,32 @@
 {
   "name": "tracker-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0-rc.1",
   "private": true,
   "type": "module",
-  "description": "Local stdio MCP sidecar for Tracker projects. JSON/file only — does not link tracker.jar.",
-  "files": ["dist", "src", "README.md", "service/LICENSE"],
+  "description": "Local 11-tool MCP server for Tracker video analysis, with a separate GPL-3 Java service.",
+  "license": "GPL-3.0-only",
+  "repository": {"type":"git","url":"git+https://github.com/YtKhurana/tracker-mcp.git"},
+  "files": ["dist", "src", "tsconfig.json", "README.md", "CHANGELOG.md", "docs", "service/src", "service/test", "service/build.sh", "service/LICENSE", "service/README.md", "service/PROTOCOL.md", "scripts/run-job-c.mjs", "scripts/verify-official.mjs", "scripts/test-service-unit.mjs", "fixtures/golden", "fixtures/official"],
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "bin": {
     "tracker-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
+    "build:service": "zsh service/build.sh",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "test:service-unit": "node scripts/test-service-unit.mjs",
     "test": "npm run build && node --test --test-concurrency=1 test/*.test.js",
     "prepack": "npm run build",
-    "checkpoint": "node scripts/prepare-checkpoint.mjs"
+    "checkpoint": "node scripts/prepare-checkpoint.mjs",
+    "job:c": "node scripts/run-job-c.mjs"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "zod": "^4.4.3"
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@types/node": "^24.2.1",

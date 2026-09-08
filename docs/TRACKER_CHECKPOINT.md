@@ -1,5 +1,25 @@
 # Official Tracker checkpoint
 
+## Final v1 release-candidate check
+
+The clean installed package successfully built its service and replayed Job C.
+The new artifact is `service/build/final-mcp-v1/golden.trz` in the development
+checkout; its SHA-256 is
+`6a21e90822c6abea8d96fecfbdb674766da5582f4f889cdcc36c8e9a0a12a807`.
+The adjacent `run.json` records all output paths, hashes, marks and calibration.
+Its CSV passes the unchanged official comparison: 12 rows, 56 numeric cells,
+seven significant digits. **Human confirmation is pending.**
+
+1. Open this exact new archive in official Tracker, without importing media.
+2. Play it; check that markers overlap the ball at frames 0 and 7.
+3. Close and reopen the same archive and confirm video and marks persist.
+4. Report any warning or mismatch; otherwise confirm these checks passed.
+
+Do not substitute an earlier golden.trk or repaired archive. This final check
+gates later named acceptance jobs; the earlier S3 evidence below is separate.
+
+## Earlier S3 evidence
+
 Status: S3 checkpoint complete. Official CSV and repaired project are checked;
 the owner also confirmed the original unchanged minimal archive opens with
 video after a fresh Tracker launch, before importing any MP4. Untouched

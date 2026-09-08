@@ -1,10 +1,11 @@
 # TrackerService and Java experiments
 
 The GPL-3 service source is under `src/`. Its authenticated local protocol is
-documented in [PROTOCOL.md](PROTOCOL.md). Item 2.1 verification passes.
-The sidecar lifecycle implementation is under review: after building the jar,
+documented in [PROTOCOL.md](PROTOCOL.md). Native service and lifecycle checks
+pass. After building the jar,
 `tracker_status(probe_service=true)` starts and checks one owned service.
-The seven v1 MCP operations are not registered yet.
+All seven v1 MCP operations are registered alongside the four read-only tools.
+Final named-job acceptance still requires the official-app checkpoint.
 
 ```sh
 ./service/build.sh
