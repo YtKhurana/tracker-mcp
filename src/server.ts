@@ -26,7 +26,7 @@ function safeTool(run: (args: unknown) => unknown) {
 }
 
 export const SERVER_NAME = "tracker-mcp";
-export const SERVER_VERSION = "0.2.0-rc.1";
+export const SERVER_VERSION = "0.2.0";
 
 /** Stdio MCP server. No Tracker/OSP classes. */
 export function createTrackerMcpServer(client = new ServiceClient()): McpServer {

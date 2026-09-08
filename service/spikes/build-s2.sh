@@ -21,9 +21,7 @@ done
 
 mkdir -p "$BUILD_DIR"
 CLASSPATH="$TRACKER_JAR:$XUGGLE_JAR:$SLF4J_JAR:$LOGBACK_CLASSIC_JAR:$LOGBACK_CORE_JAR"
-"$APP_JAVAC" -encoding UTF-8 -classpath "$CLASSPATH" -d "$BUILD_DIR" \
+exec "$APP_JAVAC" -encoding UTF-8 -classpath "$CLASSPATH" -d "$BUILD_DIR" \
   "$SCRIPT_DIR/src/tracker/mcp/spike/S2Probe.java" \
   "$SCRIPT_DIR/src/tracker/mcp/spike/S3Write.java" \
   "$SCRIPT_DIR/src/org/opensourcephysics/cabrillo/tracker/SpikePreferences.java"
-
-print "built $BUILD_DIR/tracker/mcp/spike/S2Probe.class"

@@ -1,12 +1,12 @@
 {
   "name": "tracker-mcp",
-  "version": "0.2.0-rc.1",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Local 11-tool MCP server for Tracker video analysis, with a separate GPL-3 Java service.",
   "license": "GPL-3.0-only",
   "repository": {"type":"git","url":"git+https://github.com/YtKhurana/tracker-mcp.git"},
-  "files": ["dist", "src", "tsconfig.json", "README.md", "CHANGELOG.md", "docs", "service/src", "service/test", "service/build.sh", "service/LICENSE", "service/README.md", "service/PROTOCOL.md", "scripts/run-job-c.mjs", "scripts/run-job-d.mjs", "scripts/run-job-e.mjs", "scripts/run-job-f.mjs", "scripts/run-job-g.mjs", "scripts/verify-official.mjs", "scripts/test-service-unit.mjs", "fixtures/golden", "fixtures/official"],
+  "files": ["dist", "src", "tsconfig.json", "README.md", "CHANGELOG.md", "docs", "service/src", "service/test", "service/build.sh", "service/LICENSE", "service/README.md", "service/PROTOCOL.md", "service/spikes/src", "service/spikes/build-s2.sh", "service/spikes/run-s2.sh", "scripts/prepare-checkpoint.mjs", "scripts/verify-s3.mjs", "scripts/run-job-c.mjs", "scripts/run-job-d.mjs", "scripts/run-job-e.mjs", "scripts/run-job-f.mjs", "scripts/run-job-g.mjs", "scripts/verify-official.mjs", "scripts/test-service-unit.mjs", "fixtures/golden", "fixtures/official"],
   "engines": {
     "node": ">=20"
   },

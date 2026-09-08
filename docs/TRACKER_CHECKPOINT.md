@@ -32,7 +32,10 @@ still need official verification under ADR 0006.
 The original checkpoint procedure is retained below for future regenerations.
 
 Run `npm run checkpoint` to generate a fresh directory, or use the current
-local directory `service/build/spikes/s3-final/`.
+local directory `service/build/spikes/s3-final/`. The checkpoint runner bounds
+its build phase to 30 seconds, passes a 60-second probe wait to the write
+probe, and gives the whole write child a 120-second SIGKILL watchdog so the
+probe has 60 seconds of grace beyond its requested wait.
 
 1. Open `minimal.trz`, `with-html.trz`, and `with-html-thumbnail.trz` in official
    Tracker.app, one at a time. Record which open with the video intact.

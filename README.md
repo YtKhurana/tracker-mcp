@@ -4,12 +4,13 @@ A local 11-tool stdio MCP server for Tracker video analysis. A TypeScript
 sidecar talks to a separate GPL-3 Java service using your installed Tracker
 runtime. No Tracker or Xuggle binaries are redistributed.
 
-**0.2.0-rc.1:** all 11 tools are implemented. The latest full native run passed
-108 of 109 tests; the corrupt-video test returned TIMEOUT instead of
-VIDEO_DECODE. See [release verification](docs/RELEASE_VERIFICATION.md).
-The new final artifact's official-app visual check and subsequent named job
-acceptance gates remain pending. This is a release candidate, not a claim
-that every v1 acceptance gate has passed.
+**0.2.0:** the frozen 11-tool v1 surface, Job C–G replays, and the
+official-app checkpoint are complete. A pre-staging native suite passed
+141/141 tests with no skips in 565507 ms. A later stressed post-staging run
+passed 139/141 in 694857 ms: its two timing failures passed unchanged in
+controlled quiescent reruns, but remain a documented residual accepted by the
+owner for this private stable release. See
+[release verification](docs/RELEASE_VERIFICATION.md) for exact evidence.
 
 ## Install
 
@@ -29,12 +30,13 @@ For the private GitHub release tarball, install the downloaded local archive
 in a new directory:
 
 ```sh
-npm install /absolute/path/tracker-mcp-0.2.0-rc.1.tgz --no-audit
+npm install /absolute/path/tracker-mcp-0.2.0.tgz --no-audit
 npm run build:service --prefix node_modules/tracker-mcp
 ```
 
-The tarball includes compiled sidecar code; build the Java service locally
-against your app. Do not move an installation while its service runs.
+The tarball includes compiled sidecar code but no Tracker, Xuggle, or other
+app jars. Build the Java service locally against your installed Tracker.app;
+do not move an installation while its service runs.
 Configure an MCP host with the absolute installed dist/index.js path:
 
 ```json
@@ -99,6 +101,22 @@ artifact hashes in run.json. Official-app verification remains a separate
 Job G is a separate bounded frame-assisted replay: it decodes only the pinned
 fixture's marker PNGs and explicitly does not claim general-purpose vision.
 
+The 0.2.0 verification record includes a portable suite (119 pass, 0 fail,
+22 native skips) and a pre-staging full native suite (141 pass, 0 fail,
+0 skipped in 565507 ms). A later stressed post-staging native run passed
+139/141 in 694857 ms: all Jobs C–G passed, while the EDT action-start and
+unauthenticated slow-client timing checks failed. One controlled quiescent,
+unchanged rerun of each file passed—`service-lifecycle` 1/1 in 16096.973291 ms
+and `service-native` 1/1 in 31640.377458 ms—supporting a host-contention
+inference but retaining the timing residual. The owner explicitly accepted it
+for this private stable release. A clean consumer built Java and ran the
+packaged checkpoint with exit 0 in 18.5 s (12 rows; maximum error
+`4.440892098500626e-15`; expected artifacts; zero visible windows); packaged
+Job C reproduced the approved TRZ SHA-256
+`e50fb6d38ef7f163de93fd6cd21c0af1ec92ea52dd4902cf4c8f2b80f59809b5`, and
+packaged Job G passed relocation and reaping. Native tests require a local
+Tracker.app and display session; they cannot be replaced by hosted CI.
+
 Fixture regeneration tests need Python 3, NumPy 2.2.6 and
 OpenCV opencv-python-headless==4.12.0.88. Hosted CI runs portable checks on
 Node 20/22; native tests require the app and display session. Green hosted CI
@@ -107,7 +125,9 @@ alone does not establish native video or official-app correctness.
 The package includes TypeScript and GPL-3 service source, fixtures, documentation
 and build/replay scripts. It excludes compiled Java/app jars and experiment
 outputs. Distribution remains in the existing private GitHub repository, not
-public npm. See [service documentation](service/README.md),
+public npm; the 0.2.0 release notes are for that private GitHub release. See
+[service documentation](service/README.md),
 [protocol](service/PROTOCOL.md), [license](service/LICENSE) and
-[changelog](CHANGELOG.md). Synthetic media provenance is in
+[changelog](CHANGELOG.md), plus the [0.2.0 release notes](docs/RELEASE_NOTES_0.2.0.md).
+Synthetic media provenance is in
 fixtures/golden/manifest.json.

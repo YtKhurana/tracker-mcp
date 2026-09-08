@@ -1,28 +1,42 @@
-# 0.2.0-rc.1 verification
+# 0.2.0 verification
 
-This is a private release candidate, not final v1 acceptance.
+This is the stable v1 release record for the private GitHub distribution. The
+package remains `private: true`; it is not an npm publication.
 
 - All 11 tools are registered; input validation, JSON errors and native
   session/save/export/PNG paths have regression coverage.
-- Earlier complete native run: 106/106 passed before Job C/package tests.
-- Latest full run: 108/109 passed, none skipped. The corrupt MP4 assertion
-  expected VIDEO_DECODE but received TIMEOUT with its 5000 ms open budget.
-  The unchanged focused test reproduced the mismatch. A standalone diagnostic
-  returned VIDEO_DECODE (wall time about 5.86 seconds). Cause is not established;
-  do not describe this as a clean native test run or a fixed issue.
-  A subsequent unchanged focused run passed in 27.3 seconds; this establishes
-  intermittency, not resolution.
-- TypeScript typecheck and portable Java codec/import unit tests pass.
-- Clean temporary consumer installed the local tarball with public runtime
-  dependencies and no audit, built Java against the installed app, and ran
-  SDK Job C successfully: 12 marks and 56 official CSV numeric cells agree at
-  the frozen seven-significant-digit precision.
-- Final tarball additionally includes TypeScript rebuild configuration and
-  checkpoint documentation; clean-consumer reinstall and Java rebuild pass.
+- Portable `npm test` passed 119/119 with 0 failures and 22 native tests
+  skipped. A pre-staging full native `TRACKER_NATIVE_TESTS=1 npm test` passed
+  141/141 with 0 failures and 0 skips in 565507 ms.
+- A later stressed post-staging full native run passed 139/141 in 694857 ms.
+  All Jobs C–G passed; the two failures were the EDT action-start and
+  unauthenticated slow-client timing checks. One controlled quiescent,
+  unchanged rerun of each affected file passed: `service-lifecycle` 1/1 in
+  16096.973291 ms and `service-native` 1/1 in 31640.377458 ms. That supports a
+  host-contention inference, but does not eliminate the timing residual. The
+  owner explicitly accepted that residual for this private stable release.
+- TypeScript typecheck plus Java `CodecTest` and `ProjectInputTest` pass. The
+  final package dry run contains 117 entries, including these release notes and
+  the complete checkpoint script/source chain.
+- The earlier 108/109 native run had a corrupt-MP4 assertion expecting
+  `VIDEO_DECODE` but receiving `TIMEOUT` under its 5000 ms open budget. An
+  unchanged focused test then passed three consecutive times (30.071 s,
+  25.804 s, and 24.691 s), and the pre-staging full native run passed. This is
+  evidence of the current release result, not proof that the timing-sensitive
+  decoder behavior was fixed; retain it as residual risk.
+- A clean temporary consumer installed the local package with public runtime
+  dependencies and no audit, and its Java build passed against the installed
+  Tracker.app. Its packaged checkpoint exited 0 in 18.5 s with 12 rows, maximum
+  error `4.440892098500626e-15`, all expected artifacts, and zero visible
+  windows. Packaged Job C reproduced approved TRZ SHA-256
+  `e50fb6d38ef7f163de93fd6cd21c0af1ec92ea52dd4902cf4c8f2b80f59809b5`; packaged
+  Job G passed relocation and reaping.
+- The package additionally includes TypeScript rebuild configuration and
+  checkpoint documentation; no final tarball hash is recorded here.
 - No app jars or compiled Java artifacts are included. GPL-3 service source
   and its license/build inputs are included.
-- Dependency advisory scanning was not performed; authorization for submitting
-  private dependency metadata to the registry was not obtained.
+- No online dependency advisory scan was submitted because this is a private
+  package; the release is not represented as a public-registry publication.
 
 The rc.1 archive failed the official GUI check because its video resource was
 at the ZIP root. It must not be promoted as stable. The reviewed replacement
@@ -87,4 +101,6 @@ are verified and reaped. Focused native Job G checks pass 10/10. Fresh fault,
 code, security, and test reviews passed after one pre-decode IHDR-bound fix and
 finding-only rechecks. This proves only the pinned fixture-assisted loop, not
 general visual tracking accuracy. TASKS 3.5 and the Slice 3 success metric are
-complete; the final whole-project regression and release packaging remain.
+complete. The final portable/native regression, Java checks, typecheck, and
+package validation are recorded at the top of this document; the 0.2.0 private
+GitHub release metadata is ready for publication.

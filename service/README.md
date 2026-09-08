@@ -143,9 +143,11 @@ on an arm64 Mac). A display session is required. No headless flag is set.
 npm run checkpoint
 ```
 
-`npm run checkpoint` uses a fresh directory, bounds the process to 60 seconds,
-and verifies the CSV against independent analytical values. A timeout forcibly
-terminates that child and is a failed experiment. Successful runs exit normally.
+`npm run checkpoint` uses a fresh directory and verifies the CSV against
+independent analytical values. It gives the build phase 30 seconds, passes a
+60-second probe wait to the write probe, and gives that whole child a 120-second
+watchdog (including 60 seconds of grace). A timeout forcibly SIGKILLs the child,
+names the failed phase, and fails the experiment. Successful runs exit normally.
 Preferences, temporary native files and outputs live under ignored `service/build/`.
 
 The write probe sets fixed coordinates, creates 12 marks, exports

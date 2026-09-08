@@ -75,7 +75,7 @@ test("stdio MCP initialize and tools/list", async () => {
     const init = await readJsonLine(child);
     assert.equal(init.id, 1);
     assert.equal(init.result.serverInfo.name, "tracker-mcp");
-    assert.equal(init.result.serverInfo.version, "0.2.0-rc.1");
+    assert.equal(init.result.serverInfo.version, "0.2.0");
     assert.ok(init.result.protocolVersion);
     assert.ok(init.result.capabilities?.tools);
 
