@@ -14,6 +14,7 @@ the data and saved/reopened `official.trz` successfully with its video intact.
 | --- | --- |
 | official.csv | 210b11edb567787c9462a6b2da450784664c4278a986d29c0da587c758bfc8bf |
 | official.trz | 83292ade5ffe389e1286c31df004658b9f56f98f83ceaac1a3471a111d7d1d01 |
+| service-generated.trz | 0c62192ed4157a8d63c57a165fb97308cc98075672cde3ecc1f133753c157f38 |
 
 CSV: synthetic mass; t,x,y,vx,vy; comma delimiter; Tracker's **Full Precision**
 option actually emits seven significant digits (`0.000000E0`). All 12 rows
@@ -42,8 +43,15 @@ adjacent MP4), reloads it, checks marks/calibration, compares its CSV, checks
 frame 0 → 7 → 0 pixel centres, and requires normal exit with no visible windows.
 Temporary extraction/output evidence is retained for diagnosis.
 
-**Not yet proven:** untouched service-generated archive opening in official
-Tracker from a fresh launch. The working human-saved golden video subtree is
-identical to the original generated subtree. Changing serialization without
-a discriminating test would not establish the root cause. S3 remains open;
-these official references alone do not authorize skipping its exit check.
+## Original archive confirmation
+
+The owner subsequently confirmed that quitting Tracker, relaunching it and
+opening the untouched original `minimal.trz` before any MP4 worked with video
+and without the warning. Its hash was rechecked and the unchanged archive is
+preserved here as `service-generated.trz`. S3's original-artifact gate passes.
+The frozen minimal recipe is root `golden.trk` plus root
+`synthetic-parabola.mp4`, with the XML video path set to that relative filename
+through Java XMLControl. HTML and thumbnails are not required for this case.
+The original transient warning remains unexplained; do not claim it was fixed
+by a serialization change. Final newly generated artifacts still require the
+ADR 0006 official check unless byte-identical evidence can be reused.

@@ -15,6 +15,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
+    "test:service-unit": "node scripts/test-service-unit.mjs",
     "test": "npm run build && node --test --test-concurrency=1 test/*.test.js",
     "prepack": "npm run build",
     "checkpoint": "node scripts/prepare-checkpoint.mjs"

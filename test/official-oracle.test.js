@@ -21,6 +21,7 @@ test('untouched official artifacts retain their human-checkpoint hashes', () => 
   for (const [name, hash] of Object.entries({
     'official.csv': '210b11edb567787c9462a6b2da450784664c4278a986d29c0da587c758bfc8bf',
     'official.trz': '83292ade5ffe389e1286c31df004658b9f56f98f83ceaac1a3471a111d7d1d01',
+    'service-generated.trz': '0c62192ed4157a8d63c57a165fb97308cc98075672cde3ecc1f133753c157f38',
   })) assert.equal(createHash('sha256').update(read('../fixtures/official/' + name)).digest('hex'), hash);
 });
 

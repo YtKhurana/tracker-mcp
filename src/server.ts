@@ -4,7 +4,8 @@ import { runDataRead } from "./data.js";
 import { fail } from "./errors.js";
 import { runProjectInspect } from "./inspect.js";
 import { runProjectList } from "./list.js";
-import { runTrackerStatus } from "./status.js";
+import { runTrackerStatusWithService } from "./status.js";
+import { ServiceClient } from "./service-client.js";
 
 function toolText(body: unknown) {
   return { content: [{ type: "text" as const, text: JSON.stringify(body) }] };
@@ -13,7 +14,7 @@ function toolText(body: unknown) {
 function safeTool(run: (args: unknown) => unknown) {
   return async (args: Record<string, unknown> | undefined) => {
     try {
-      return toolText(run(args ?? {}));
+      return toolText(await run(args ?? {}));
     } catch {
       return toolText(fail("PARSE_FAILED", "unexpected tool failure", { reason: "uncaught" }));
     }
@@ -24,21 +25,22 @@ export const SERVER_NAME = "tracker-mcp";
 export const SERVER_VERSION = "0.1.0";
 
 /** Stdio MCP server. No Tracker/OSP classes. */
-export function createTrackerMcpServer(): McpServer {
+export function createTrackerMcpServer(client = new ServiceClient()): McpServer {
   const server = new McpServer({
     name: SERVER_NAME,
     version: SERVER_VERSION,
   });
+  server.server.onclose = () => { void client.close(); };
   server.registerTool(
     "tracker_status",
     {
       description:
-        "Preflight Tracker.app, bundled JRE home (Contents/runtime/Contents/Home), and xuggle-xuggler-server-all.jar. Optional probe_service (boolean, default false) is ignored in v0; service is always null. Does not start Java.",
+        "Preflight Tracker.app, bundled JRE and Xuggle. probe_service (boolean, default false) starts and checks the owned service; false reports existing state without starting Java.",
       inputSchema: {
         probe_service: z.unknown().optional(),
       },
     },
-    safeTool(runTrackerStatus),
+    safeTool(args => runTrackerStatusWithService(args, client)),
   );
   server.registerTool(
     "project_list",

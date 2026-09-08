@@ -4,8 +4,8 @@ A local stdio MCP server for inspecting Tracker video-analysis projects.
 
 **Current status:** four read-only v0 tools work. Java experiments also create
 calibrated point-mass projects and CSVs, but the seven v1 session tools are
-pending the service-generated archive opening checkpoint. Official reference
-CSV and a human-saved project are preserved in `fixtures/official/`. This is not a finished
+under implementation after the completed S3 checkpoint. Official reference
+CSV and checked archives are preserved in `fixtures/official/`. This is not a finished
 v1 release.
 
 ## Install and run

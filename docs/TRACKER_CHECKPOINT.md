@@ -1,11 +1,11 @@
 # Official Tracker checkpoint
 
-Status: official CSV and repaired project received and checked. Untouched
-copies and evidence are in `fixtures/official/`. The remaining check is the
-original service-generated artifact: quit Tracker normally, relaunch it,
-and open the original `service/build/spikes/s3-final/minimal.trz` before any
-raw MP4. Report whether the video loads without warning; do not overwrite it.
-The repaired project does not substitute for this S3 exit check.
+Status: S3 checkpoint complete. Official CSV and repaired project are checked;
+the owner also confirmed the original unchanged minimal archive opens with
+video after a fresh Tracker launch, before importing any MP4. Untouched
+copies, hashes and evidence are in `fixtures/official/`. The transient initial
+warning is not attributed to a proven code defect. New final v1 artifacts
+still need official verification under ADR 0006.
 
 The original checkpoint procedure is retained below for future regenerations.
 

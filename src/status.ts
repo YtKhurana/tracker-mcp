@@ -1,5 +1,6 @@
 import { fail, type ErrorEnvelope } from "./errors.js";
 import { discoverTrackerRuntime, type DiscoverOptions, type DiscoverSuccess } from "./discover.js";
+import type { ServiceClient } from './service-client.js';
 
 export type TrackerStatusSuccess = DiscoverSuccess & {
   service: null;
@@ -26,4 +27,14 @@ export function runTrackerStatus(
     return discovered;
   }
   return { ...discovered, service: null };
+}
+
+export async function runTrackerStatusWithService(args: unknown, client: ServiceClient, options: DiscoverOptions = {}) {
+  const result = runTrackerStatus(args, options);
+  if (!result.ok) return result;
+  if ((args as Record<string, unknown> | null | undefined)?.probe_service === true) {
+    const probe = await client.request('status');
+    if (!probe.ok) return probe;
+  }
+  return { ...result, service: client.snapshot() };
 }

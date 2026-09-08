@@ -1,4 +1,39 @@
-# Tracker Java experiments
+# TrackerService and Java experiments
+
+The GPL-3 service source is under `src/`. Its authenticated local protocol is
+documented in [PROTOCOL.md](PROTOCOL.md). Item 2.1 verification passes.
+The sidecar lifecycle implementation is under review: after building the jar,
+`tracker_status(probe_service=true)` starts and checks one owned service.
+The seven v1 MCP operations are not registered yet.
+
+```sh
+./service/build.sh
+npm run test:service-unit
+TRACKER_NATIVE_TESTS=1 node --test test/service-native.test.js
+TRACKER_NATIVE_TESTS=1 node --test test/service-lifecycle-native.test.js
+TRACKER_NATIVE_TESTS=1 node --test test/mcp-service-native.test.js
+```
+
+`build.sh` uses the installed app compiler and creates
+`service/build/TrackerService.jar`. The portable codec/import tests require
+JDK 21 but no Tracker classes; CI runs them separately. Native tests require
+the official app runtime and a macOS display session.
+
+Imports are data-only: bounded XML/ZIP parsing, fixed coordinates, point masses,
+and local MP4/MOV/AVI video. Project media must stay within the project directory
+or archive. Variable calibration and unsupported analysis settings fail
+explicitly. Supplemental archive HTML is never opened. Only validated staged
+media reaches the direct Xuggle decoder; its error path does not invoke
+Tracker's file-opening dialogs.
+
+All Tracker state is EDT-owned. Output paths are absolute, parents must exist,
+and existing outputs are never overwritten. A project save emits a `.trk`,
+`.trz`, and companion video; CSV/JSON export with a path returns metadata, while
+inline exports return bounded data. Session close discards unsaved memory but
+does not remove published files. A timeout poisons the process; its owner must
+terminate/restart it before accepting more work.
+
+## Earlier experiments
 
 The GPL-3 source under `spikes/` links the installed Tracker app. It is an
 experiment, not the JSON-RPC service or an MCP tool.
@@ -35,5 +70,6 @@ To reload a generated project with the hidden loader:
 Lifecycle findings: callbacks may repeat, so writes use a one-shot guard.
 Dispose the frame's owned dialogs before deregistering the panel. Java setter
 angles are radians; this Tracker serializer records the angle in degrees.
-The official-app checkpoint remains pending, including export precision and
-final numerical tolerance. See [checkpoint instructions](../docs/TRACKER_CHECKPOINT.md).
+The S3 official-app checkpoint passed; its untouched references and fixed
+seven-significant-digit comparison are under `fixtures/official/`. New final
+v1 artifacts still require the [official check](../docs/TRACKER_CHECKPOINT.md).
